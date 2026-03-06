@@ -29,12 +29,9 @@ export default function Dashboard() {
   };
 
   const getStats = () => {
-    let emerging = 0; let watchlist = 0; let fads = 0;
-    trends.forEach(t => {
-      if (t.classification === 'Emerging Trend') emerging++;
-      if (t.classification === 'Watchlist') watchlist++;
-      if (t.classification === 'Likely Fad') fads++;
-    });
+    const emerging = trends.filter(t => t.classification === 'Emerging Trend').length;
+    const watchlist = trends.filter(t => t.classification === 'Watchlist Signal').length;
+    const fads = trends.filter(t => t.classification === 'Likely Fad').length;
     return { emerging, watchlist, fads };
   };
 

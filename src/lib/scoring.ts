@@ -26,20 +26,19 @@ export function calculateTrendScore(signals: RawSignals) {
         (normalizedYoutube * 3);
 
     // 3. Clamp the score between 0 and 100 and add randomness.
-    let trendScore = clamp(Math.round(scoreFloat), 0, 100);
-    trendScore = trendScore + Math.floor(Math.random() * 5);
-    trendScore = clamp(trendScore, 0, 100);
+    const calculatedScore = Math.round(scoreFloat) + Math.floor(Math.random() * 5);
+    const finalScore = Math.max(0, Math.min(100, calculatedScore));
 
     // 4. Ensure that typical runs produce scores between:
     let classification: TrendClassification = 'Likely Fad';
-    if (trendScore >= 70) {
+    if (finalScore >= 70) {
         classification = 'Emerging Trend';
-    } else if (trendScore >= 40) {
+    } else if (finalScore >= 40) {
         classification = 'Watchlist';
     }
 
     return {
-        trendScore,
+        trendScore: finalScore,
         classification,
     };
 }

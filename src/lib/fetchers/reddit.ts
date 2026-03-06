@@ -1,36 +1,24 @@
 export async function fetchRedditData(keyword: string) {
     try {
-        const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(keyword)}&limit=50&sort=new`;
-
-        const res = await fetch(url, {
-            headers: {
-                "User-Agent": "OpportunityOS Trend Radar"
+        const response = await fetch(
+            `https://api.reddit.com/search?q=${encodeURIComponent(keyword)}&limit=25`,
+            {
+                headers: {
+                    "User-Agent": "Mozilla/5.0 OpportunityOS Trend Radar"
+                }
             }
-        });
+        );
 
-        if (!res.ok) {
-            console.log("[reddit] request failed for", keyword);
+        const json = await response.json();
+
+        if (!json?.data?.children) {
             return { mentions: 0 };
         }
 
-        const json = await res.json();
-        const posts = json?.data?.children || [];
+        return { mentions: json.data.children.length };
 
-        const subredditSet = new Set();
-        posts.forEach((post: any) => {
-            if (post?.data?.subreddit) {
-                subredditSet.add(post.data.subreddit);
-            }
-        });
-
-        const mentions = subredditSet.size;
-
-        console.log("[reddit]", keyword, mentions);
-
-        return { mentions };
-    } catch (error: any) {
-        console.log("[reddit] request failed for", keyword);
+    } catch (error) {
+        console.error("Reddit fetch failed:", error);
         return { mentions: 0 };
     }
 }
-

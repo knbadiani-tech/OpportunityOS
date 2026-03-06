@@ -119,16 +119,17 @@ async function analyzeKeyword(keyword: string): Promise<TrendResult> {
         youtubeVideos: yt.uploads ?? 0,
     };
 
-    const trendScore =
-        (signals.googleTrendsScore * 2) +
-        (signals.redditMentions * 3) +
-        (signals.youtubeVideos * 5);
+    const trendScore = Math.round(
+        (signals.googleTrendsScore * 1.5) +
+        (signals.redditMentions * 2) +
+        (signals.youtubeVideos * 3)
+    );
 
     let classification: import('@/lib/types').TrendClassification = "Likely Fad";
 
-    if (trendScore >= 50) {
+    if (trendScore >= 65) {
         classification = "Emerging Trend";
-    } else if (trendScore >= 25) {
+    } else if (trendScore >= 35) {
         classification = "Watchlist Signal";
     } else {
         classification = "Likely Fad";
@@ -141,7 +142,18 @@ async function analyzeKeyword(keyword: string): Promise<TrendResult> {
     });
     console.log('[run-radar] Trend score:', keyword, trendScore);
 
-    const opportunityBrief = await generateOpportunityBrief(keyword, trendScore, signals);
+    let opportunityBrief;
+    try {
+        opportunityBrief = await generateOpportunityBrief(keyword, trendScore, signals);
+    } catch (error) {
+        console.warn('[run-radar] OpenAI brief failed for', keyword);
+        opportunityBrief = {
+            signalSummary: "Opportunity brief generation skipped due to an error.",
+            consumerInsight: "Insight generation unavailable.",
+            founderProductIdea: "Product idea unavailable.",
+            timeToMainstream: "Unknown"
+        };
+    }
 
     return {
         keyword,

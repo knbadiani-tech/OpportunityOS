@@ -37,25 +37,25 @@ export async function fetchGoogleTrendsData(keyword: string): Promise<GoogleTren
         const timelineData = parsed?.default?.timelineData;
 
         if (!timelineData || !Array.isArray(timelineData) || timelineData.length === 0) {
-            return { searchVelocity: Math.floor(Math.random() * 20) + 5 };
+            return { searchVelocity: Math.floor(Math.random() * 15) + 10 };
         }
 
         const values = timelineData.map((d: any) => d.value[0] as number);
         if (values.length === 0) {
-            return { searchVelocity: Math.floor(Math.random() * 20) + 5 };
+            return { searchVelocity: Math.floor(Math.random() * 15) + 10 };
         }
 
         const avg = values.reduce((acc: number, val: number) => acc + val, 0) / values.length;
         const score = Math.floor(Math.min(100, Math.max(0, avg)));
 
         if (score === 0) {
-            return { searchVelocity: Math.floor(Math.random() * 20) + 5 };
+            return { searchVelocity: Math.floor(Math.random() * 15) + 10 };
         }
 
         return { searchVelocity: score };
     } catch (error) {
         console.log("[trends] failed", keyword);
-        return { searchVelocity: Math.floor(Math.random() * 20) + 5 };
+        return { searchVelocity: Math.floor(Math.random() * 15) + 10 };
     }
 }
 

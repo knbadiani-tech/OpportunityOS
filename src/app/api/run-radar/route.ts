@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { fetchGoogleTrendsData } from '@/lib/fetchers/googleTrends';
 import { fetchRedditData } from '@/lib/fetchers/reddit';
 import { fetchYouTubeData } from '@/lib/fetchers/youtube';
-import { calculateTrendScore } from '@/lib/scoring';
 import { generateOpportunityBrief } from '@/lib/openai';
 import { TrendResult, TrendSignals } from '@/lib/types';
 
@@ -120,11 +119,18 @@ async function analyzeKeyword(keyword: string): Promise<TrendResult> {
         youtubeVideos: yt.uploads ?? 0,
     };
 
-    const { trendScore, classification } = calculateTrendScore({
-        googleSearchVelocity: signals.googleTrendsScore,
-        redditMentions: signals.redditMentions,
-        youtubeActivity: signals.youtubeVideos,
-    });
+    const trendScore =
+        (signals.googleTrendsScore * 2) +
+        (signals.redditMentions * 3) +
+        (signals.youtubeVideos * 5);
+
+    let classification: import('@/lib/types').TrendClassification = "Likely Fad";
+
+    if (trendScore >= 50) {
+        classification = "Emerging Trend";
+    } else if (trendScore >= 25) {
+        classification = "Watchlist Signal";
+    }
 
     console.log('Signals:', keyword, {
         googleTrendsScore: signals.googleTrendsScore,

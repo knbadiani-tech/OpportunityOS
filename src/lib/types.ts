@@ -1,4 +1,4 @@
-export type TrendClassification = 'Emerging Trend' | 'Watchlist' | 'Likely Fad';
+export type TrendClassification = 'Emerging Trend' | 'Watchlist Signal' | 'Likely Fad';
 
 export interface TrendSignals {
     /**

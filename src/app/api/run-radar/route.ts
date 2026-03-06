@@ -130,6 +130,8 @@ async function analyzeKeyword(keyword: string): Promise<TrendResult> {
         classification = "Emerging Trend";
     } else if (trendScore >= 25) {
         classification = "Watchlist Signal";
+    } else {
+        classification = "Likely Fad";
     }
 
     console.log('Signals:', keyword, {

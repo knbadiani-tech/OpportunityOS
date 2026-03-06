@@ -3,7 +3,7 @@ export async function fetchRedditData(keyword: string) {
     try {
 
         const url =
-            `https://api.reddit.com/search?q=${encodeURIComponent(keyword)}&limit=25&sort=new`
+            `https://www.reddit.com/search.json?q=${encodeURIComponent(keyword)}&limit=25&sort=new`
 
         const response = await fetch(url, {
             headers: {

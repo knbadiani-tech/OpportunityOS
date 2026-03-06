@@ -91,6 +91,12 @@ async function runRadarPipeline() {
 
         const top = filled.slice(0, 10);
 
+        top.forEach((trend, index) => {
+            if (index < 3) trend.classification = "Emerging Trend";
+            else if (index < 7) trend.classification = "Watchlist Signal";
+            else trend.classification = "Likely Fad";
+        });
+
         return {
             status: 'ok',
             trends: top,
@@ -106,28 +112,29 @@ async function runRadarPipeline() {
 }
 
 async function analyzeKeyword(keyword: string): Promise<TrendResult> {
-    // Fetch external signals with per-source timeouts and error handling
-    const [gt, reddit, yt] = await Promise.all([
-        fetchGoogleTrendsData(keyword),
-        fetchRedditData(keyword),
-        fetchYouTubeData(keyword),
-    ]);
+    let gt = 0;
+    let reddit = 0;
+    let youtube = 0;
+
+    try { gt = (await fetchGoogleTrendsData(keyword)).searchVelocity; } catch { }
+    try { reddit = (await fetchRedditData(keyword)).mentions; } catch { }
+    try { youtube = (await fetchYouTubeData(keyword)).uploads ?? 0; } catch { }
 
     const signals: TrendSignals = {
-        googleTrendsScore: gt.searchVelocity ?? 0,
-        redditMentions: reddit.mentions ?? 0,
-        youtubeVideos: yt.uploads ?? 0,
+        googleTrendsScore: gt,
+        redditMentions: reddit,
+        youtubeVideos: youtube,
     };
 
     const trendScore = Math.round(
-        (signals.googleTrendsScore * 1.5) +
-        (signals.redditMentions * 2) +
-        (signals.youtubeVideos * 3)
+        (signals.googleTrendsScore * 1.3) +
+        (signals.redditMentions * 2.5) +
+        (signals.youtubeVideos * 2)
     );
 
     let classification: import('@/lib/types').TrendClassification = "Likely Fad";
 
-    if (trendScore >= 65) {
+    if (trendScore >= 60) {
         classification = "Emerging Trend";
     } else if (trendScore >= 35) {
         classification = "Watchlist Signal";
